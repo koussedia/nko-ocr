@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+title: nko-ocr
+message: >-
+  If you use these N'Ko OCR models or dataset, please cite this
+  repository as below.
+type: software
+authors:
+  - family-names: Diarra
+    given-names: Fousseyni
+    email: fdiarrasam@gmail.com
+version: 2.0.0
+date-released: 2026-10-05
+url: https://github.com/koussedia/nko-ocr
+repository-code: https://github.com/koussedia/nko-ocr
+license: GPL-3.0-only
+keywords:
+  - ocr
+  - nko
+  - tesseract
+  - bambara
+  - mali
+  - low-resource-languages
+abstract: >-
+  Tesseract LSTM models for N'Ko script (ߒߞߏ) optical character
+  recognition — the writing system of Manding languages (Bambara,
+  Maninka, Dioula). v2 achieves 6.26% character error rate. First
+  usable open-source N'Ko OCR, built from scratch (Oct 2026).
