@@ -2,7 +2,7 @@
 
 Tesseract LSTM models for **N'Ko (ߒߞߏ)** optical character recognition — the writing system of Manding languages (Bambara, Maninka, Dioula), spoken by ~50 million people in West Africa.
 
-**Current release: v2** — CER **6.26%**, WER **17.85%** on a 92-line held-out test set (~94% of characters correct).
+**Current release: v4** — CER **4.09%**, WER **16.01%** on a 92-line held-out test set (~96% of characters correct).
 
 ![Demo: scanned N'Ko dictionary page → nko-v2 output](assets/demo-before-after.png)
 *Real output of `nko-v2` on a scanned page of the Baba Diane French–N'Ko dictionary (2014).*
@@ -23,19 +23,24 @@ Same 92-line test set for both versions (`lstmeval`):
 | Model | CER | WER | Training data |
 |-------|-----|-----|---------------|
 | v1 (`nko-v1.traineddata`) | 15.84% | 34.84% | 914 pure-N'Ko images, 18k iterations |
-| **v2 (`nko-v2.traineddata`)** | **6.26%** | **17.85%** | v1 + 4,000 targeted images (diacritics, N'Ko digits, 2 fonts) + 2,856-word dictionary wordlist, 32k iterations |
+| **v4 (`nko-v4.traineddata`)** | **4.09%** | **16.01%** | v2 fine-tuned on 570 pure-N'Ko lines (RTL, LR 0.0001) + 6,353-word extended wordlist |
+| v2 (`nko-v2.traineddata`) | 6.26% | 17.85% | v1 + 4,000 targeted images (diacritics, N'Ko digits, 2 fonts) + 2,856-word dictionary wordlist, 32k iterations |
 
-v2 divides character errors by 2.5 and word errors by 2 compared to v1.
+v2 divides character errors by 2.5 and word errors by 2 compared to v1; v4 cuts v2's remaining errors by another ~35%.
+
+v4 also wins on a 327-line stratified held-out set (all text genres: CER −6.3 pp, WER −23 pp vs v2) and on tone-mark recall. On real mixed N'Ko/French photos, the mixed pipeline recovers **26/28** Latin words (Fousseyni protocol) — on par with v2.
+
+*Micro-fix 16-10-2026:* 35 single-character entries removed from the extended wordlist (`corpus/dictionnaire-nko-wordlist-etendue.txt`) — they blocked Latin proper-noun recovery in the mixed pipeline; no impact on N'Ko. *Known limitation:* **long tone marks (߯ ߭ ߰ ߱) are neutralised (~0% recall)** on both v2 and v4 — documented, not blocking.
 
 ## Quickstart
 
 ```bash
 # 1. Grab the model (or use models/ in this repo)
 # 2. Run Tesseract (>= 5.0)
-tesseract page.png output.txt -l nko-v2 --tessdata-dir ./models
+tesseract page.png output.txt -l nko-v4 --tessdata-dir ./models
 
 # single text line / column
-tesseract line.png stdout -l nko-v2 --tessdata-dir ./models --psm 6
+tesseract line.png stdout -l nko-v4 --tessdata-dir ./models --psm 6
 ```
 
 Notes:
@@ -47,9 +52,10 @@ Notes:
 
 ```
 nko-ocr/
-├── models/   nko-v2.traineddata (3.3 MB, recommended) · nko-v1.traineddata (3.2 MB)
+├── models/   nko-v4.traineddata (3.3 MB, recommended) · nko-v2.traineddata (3.3 MB) · nko-v1.traineddata (3.2 MB)
 ├── corpus/   corpus-nko.txt — 2,211 N'Ko lines (Bambara, Mali) used for training
 │             dictionnaire-nko-wordlist.txt — 2,856-word N'Ko wordlist (Baba Diane dictionary)
+│             dictionnaire-nko-wordlist-etendue.txt — 6,353-word extended N'Ko wordlist (v4 production, micro-fixed 16-10-2026)
 ├── examples/ ocr_example.sh — minimal end-to-end example
 ├── docs/     TRAINING.md — how the models were trained (reproducible notes)
 └── assets/   demo-before-after.png
